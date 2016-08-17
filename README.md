@@ -1,7 +1,7 @@
-# DVD
-Docker, Vagrant, and Django
+# DVD-R (a.k.a. DVD)
+### Docker, Vagrant, Django, and Redis
 
-This is a playground for me to test out getting **Django + PostgreSQL** working within **Docker** containers. I'm also experimenting with **Vagrant** as a standardized Ubuntu 16.04 development environment and to reduce complexity/limitations associated with running Docker Engine in Windows.
+This is a playground for me to test out getting **Django, PostgreSQL, and Redis** working together within multiple **Docker** containers. I'm also experimenting with **Vagrant** as a standardized Ubuntu 16.04 development environment and to reduce complexity/limitations associated with running Docker Engine in Windows.
 
 ## Components
 
@@ -22,11 +22,11 @@ This file is derived from the standard `python:3.5-onbuild` Dockerfile, only mad
 
 ### docker-compose.yml
 
-Compose is tasked with spinning up two containers: one for PostgreSQL, and the above container for Django. Right now it just transparently forwards port 8000 for testing. The container's `command` can be easily updated to run the server as a WSGI application.
+Compose is tasked with spinning up three containers: one for PostgreSQL, the above container for Django, and one for Redis. Right now Compose transparently forwards port 8000 for testing. The `web` container's `command` can be easily updated to run the Django server as a WSGI application.
 
 ### requirements.txt
 
-A barebones Django + PostgreSQL app can be started with just two Python packages: `Django`, and `psycopg2`.
+Includes the PyPI packages needed to make Django, Postgre, and Redis work together.
 
 ## Directions
 
@@ -115,3 +115,21 @@ These variables will also be available for use in the `web` container. To use th
     }
 
 The next time you run `docker-compose up` the `web` and `db` containers will both make use of the new password.
+
+### Redis Support
+
+An instance of Redis exists in the `redis` container. To integrate this into your Django project, add `django_redis` to your project's `INSTALLED_APPS` and include the following in `settings.py`:
+
+    # django-redis
+    CACHES = {
+        "default": {
+            "BACKEND": "django_redis.cache.RedisCache",
+            "LOCATION": "redis://redis:6379/1",
+            "OPTIONS": {
+                "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            }
+        }
+    }
+    SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+    SESSION_CACHE_ALIAS = "default"
+

@@ -4,6 +4,11 @@ services:
   db:
     image: postgres
     env_file: secure.env
+  redis:
+    image: redis
+    env_file: secure.env
+    depends_on:
+      - db
   web:
     build: .
     env_file: secure.env
@@ -14,3 +19,4 @@ services:
       - "8000:8000"
     depends_on:
       - db
+      - redis
