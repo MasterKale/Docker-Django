@@ -8,8 +8,8 @@ Vagrant.configure("2") do |config|
   # Search for boxes at https://atlas.hashicorp.com/search.
   # config.vm.box = "johnpbloch/xenial64"
   # config.vm.provider "hyperv" do |hv|
-  #   hv.memory = 1024
-  #   hv.cpus = 2
+  #   hv.memory = 3072
+  #   hv.cpus = 1
   #   hv.vmname = "DVD"
   # end
 
