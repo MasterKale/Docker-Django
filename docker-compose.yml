@@ -3,8 +3,10 @@ version: '2'
 services:
   db:
     image: postgres
+    env_file: secure.env
   web:
     build: .
+    env_file: secure.env
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
       - .:/usr/src/app
