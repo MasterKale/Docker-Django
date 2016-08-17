@@ -1,4 +1,4 @@
-# DVD-R (a.k.a. DVD)
+# DVD-R (formerly DVD)
 ### Docker, Vagrant, Django, and Redis
 
 This is a playground for me to test out getting **Django, PostgreSQL, and Redis** working together within multiple **Docker** containers. I'm also experimenting with **Vagrant** as a standardized Ubuntu 16.04 development environment and to reduce complexity/limitations associated with running Docker Engine in Windows.
