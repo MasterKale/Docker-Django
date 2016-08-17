@@ -54,5 +54,9 @@ Vagrant.configure("2") do |config|
     # Add machine name to the bash prompt
     sudo -u ubuntu sed -i -e 's/${debian_chroot:+($debian_chroot)}/${debian_chroot:+($debian_chroot)}(DVD) /g' /home/ubuntu/.bashrc
 
+    # Add a `dc` alias for `docker-compose`
+    touch /home/ubuntu/.bash_aliases
+    echo "alias dc=\"docker-compose\"" > /home/ubuntu/.bash_aliases
+
   SHELL
 end
