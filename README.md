@@ -14,6 +14,7 @@ Vagrant is a basic Ubuntu 16.04/`xenial64` image with a few customizations:
 * Install Docker
 * Install Docker-Compose
 * Miscellaneous Docker-related setup steps
+* Create the alias `dc` for `docker-compose`
 
 ### Dockerfile
 
@@ -57,6 +58,8 @@ For example, to create a new Django project, run the following command:
 
 When the command finishes, you'll find the new project files on your local machine. Thanks to the mapped drive they'll also appear in Vagrant.
 
+> NOTE: The bash alias `dc` has been added to Vagrant to cut down on the number of times you have to type `docker-compose`.
+
 Before you proceed any further, go ahead and update the new project to use the Postgres database in the `db` container:
 
     # composeexample/settings.py
@@ -82,3 +85,33 @@ While you *can* run `docker-compose run web python manage.py runserver` to start
     docker-compose up
 
 This will start both the `db` and `web` containers and make the Django site available locally at http://localhost:8000.
+
+### Specifying environment variables
+
+Environment variables can be declared within `.env` files and assigned to services using the `env_file` key for a particular service:
+
+    services:
+      db:
+        image: postgres
+        env_file: secure.env
+
+For this project, a `secure.env` file has been included to demonstrate how to set a different superuser password for the `db` container (see [here](https://hub.docker.com/_/postgres/) for more postgres-specific variables).
+
+Follow this format when adding new variables:
+
+    VARIABLE_NAME="value-here"
+
+These variables will also be available for use in the `web` container. To use them in your Django project, simply use `os.getenv()`:
+
+    import os
+
+    # composeexample/settings.py
+    DATABASES = {
+        'default': {
+            ...
+            'PASS': os.getenv('POSTGRES_PASSWORD')
+            ...
+        }
+    }
+
+The next time you run `docker-compose up` the `web` and `db` containers will both make use of the new password.
