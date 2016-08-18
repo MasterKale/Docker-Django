@@ -3,6 +3,15 @@
 
 This is a playground for me to test out getting **Django, PostgreSQL, and Redis** working together within multiple **Docker** containers. I'm also experimenting with **Vagrant** as a standardized Ubuntu 16.04 development environment and to reduce complexity/limitations associated with running Docker Engine in Windows.
 
+## Prerequisites
+
+* [VirtualBox & VirtualBox Guest Extensions](https://www.virtualbox.org/wiki/Downloads)
+* [Vagrant](https://www.vagrantup.com/docs/installation/)
+* Vagrant Plugins:
+    * (All) [vagrant-vbguest](https://github.com/dotless-de/vagrant-vbguest) to keep Guest Extensions up-to-date in the Guest VM
+    * (Windows) [vagrant-multi-putty](https://github.com/nickryand/vagrant-multi-putty) for PuTTY SSH support
+* (Windows) [PuTTY](http://www.chiark.greenend.org.uk/~sgtatham/putty/download.html) for ssh support
+
 ## Components
 
 ### Vagrantfile
@@ -32,21 +41,23 @@ Includes the PyPI packages needed to make Django, Postgre, and Redis work togeth
 
 ### Booting up Vagrant
 
-Vagrant is intended for local development. To get started, [install Vagrant](https://www.vagrantup.com/docs/installation/) and either [Hyper-V](https://blogs.technet.microsoft.com/canitpro/2015/09/08/step-by-step-enabling-hyper-v-for-use-on-windows-10/) (Windows-only) or [VirtualBox](https://www.virtualbox.org/wiki/Downloads) (all platforms).
-
-> NOTE: Go into the `Vagrantfile` and comment out the provider you *won't* be using. You'll find basic providers for both Hyper-V and VirtualBox.
-
-Start the VM to begin:
+Vagrant is intended for local development. To begin, start the VM:
 
     vagrant up
 
-Once the VM is up, you can use the `vagrant ssh` command (on Linux) or PuTTY (on Windows) to remote into the machine.
+Once the VM is up, **Linux** and **macOS** users can use the following commands to remote into the machine:
 
-> NOTE: If you remote in using an ssh client, the default login **username** and **password** should be **vagrant** and **vagrant** respectively
+    vagrant ssh
+
+**Windows** users can use a similar command after installing **PuTTY** and the **vagrant-multi-putty** plugin:
+
+    vagrant putty
+
+> NOTE: If you remote in using a typical ssh client, the default login **username** and **password** should be **vagrant** and **vagrant** respectively.
 
 The folder containing this cloned repo will be mapped to `/home/ubuntu/data/`. You'll start in `/home/ubuntu/`, so just `cd data` to jump into the folder containing the Docker, Vagrant, and Django files. From here, you can use `docker-compose` to run commands within either container.
 
-> NOTE: Django is contained within the `web` container, while PostgreSQL is in the `db` container.
+> NOTE: Django is contained within the `web` container, while PostgreSQL is in the `db` container and Redis is in the `redis` container.
 
 ### Working with containerized Django
 

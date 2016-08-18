@@ -5,21 +5,13 @@ Vagrant.configure("2") do |config|
   config.vm.network "forwarded_port", guest: 8000, host: 8000
   config.vm.synced_folder ".", "/home/ubuntu/data"
 
-  # Search for boxes at https://atlas.hashicorp.com/search.
-  # config.vm.box = "johnpbloch/xenial64"
-  # config.vm.provider "hyperv" do |hv|
-  #   hv.memory = 3072
-  #   hv.cpus = 1
-  #   hv.vmname = "DVD"
-  # end
-
   config.vm.box = "ubuntu/xenial64"
   config.vm.provider "virtualbox" do |vb|
     vb.gui = false
     vb.memory = "3072"
     vb.cpus = 1
     vb.customize ['modifyvm', :id, '--ostype', 'Ubuntu_64']
-    vb.name = "DVD"
+    vb.name = "DVD-R"
   end
 
   # Enable provisioning with a shell script. Additional provisioners such as
@@ -41,22 +33,25 @@ Vagrant.configure("2") do |config|
     apt-get install -y linux-image-extra-$(uname -r) docker-engine
 
     # Add default ubuntu user to the docker group
-    sudo groupadd docker
-    sudo usermod -aG docker ubuntu
+    groupadd docker
+    usermod -aG docker ubuntu
     
     # Start Docker
     service docker start
 
     # Install docker-compose
-    curl -L https://github.com/docker/compose/releases/download/1.8.0/docker-compose-`uname -s`-`uname -m` > /usr/local/bin/docker-compose
+    curl -sSL https://github.com/docker/compose/releases/download/1.8.0/docker-compose-`uname -s`-`uname -m` > /usr/local/bin/docker-compose
     chmod +x /usr/local/bin/docker-compose
     
     # Add machine name to the bash prompt
-    sudo -u ubuntu sed -i -e 's/${debian_chroot:+($debian_chroot)}/${debian_chroot:+($debian_chroot)}(DVD) /g' /home/ubuntu/.bashrc
+    sudo -u ubuntu sed -i -e 's/${debian_chroot:+($debian_chroot)}/${debian_chroot:+($debian_chroot)}(DVD-R) /g' /home/ubuntu/.bashrc
+
+    # Enable color prompts
+    sudo -u ubuntu sed -i -e 's/#force_color_prompt=yes/force_color_prompt=yes/g' /home/ubuntu/.bashrc
 
     # Add a `dc` alias for `docker-compose`
     touch /home/ubuntu/.bash_aliases
-    echo "alias dc=\"docker-compose\"" > /home/ubuntu/.bash_aliases
+    echo "alias dc=\"docker-compose\"" >> /home/ubuntu/.bash_aliases
 
   SHELL
 end

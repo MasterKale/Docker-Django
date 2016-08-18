@@ -3,6 +3,8 @@ version: '2'
 services:
   db:
     image: postgres
+    volumes:
+      - ./psql:/usr/src/db
     env_file: secure.env
   redis:
     image: redis
