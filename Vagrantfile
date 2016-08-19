@@ -3,6 +3,7 @@
 
 Vagrant.configure("2") do |config|
   config.vm.network "forwarded_port", guest: 8000, host: 8000
+  config.vm.network "forwarded_port", guest: 15432, host: 15432
   config.vm.synced_folder ".", "/home/ubuntu/data"
 
   config.vm.box = "ubuntu/xenial64"

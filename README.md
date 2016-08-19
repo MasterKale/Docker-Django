@@ -120,7 +120,9 @@ These variables will also be available for use in the `web` container. To use th
     DATABASES = {
         'default': {
             ...
-            'PASS': os.getenv('POSTGRES_PASSWORD')
+            'NAME': os.getenv('POSTGRES_USER'),
+            'USER': os.getenv('POSTGRES_USER'),
+            'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
             ...
         }
     }

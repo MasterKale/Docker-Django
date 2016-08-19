@@ -6,6 +6,8 @@ services:
     volumes:
       - ./psql:/usr/src/db
     env_file: secure.env
+    ports:
+      - "15432:5432"
   redis:
     image: redis
     env_file: secure.env
