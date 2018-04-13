@@ -147,3 +147,10 @@ CACHES = {
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 SESSION_CACHE_ALIAS = "default"
 ```
+
+Also set a static root:
+
+```py
+# appname/settings.py
+STATIC_ROOT = 'static'
+```
