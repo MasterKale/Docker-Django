@@ -4,4 +4,4 @@ exclude =
     manage.py,
     migrations,
     tests
-inline-quotes = "
+inline-quotes = '
