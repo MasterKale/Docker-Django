@@ -17,6 +17,8 @@ This is a boilerplate repo intended for quickly starting a new **Django** projec
     - `rm -rf .git/`
 3. Create a new git repo
     - `git init`
+    - `git add .`
+    - `git commit -m "Initial Commit"`
 4. Install Python dependencies in a Python3 virtual environment
     - `pipenv install --three`
 5. Create a new Django project
