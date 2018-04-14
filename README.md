@@ -1,148 +1,127 @@
-# DVD-R (formerly DVD)
-### Docker, Vagrant, Django, and Redis
+# Docker'd Django
+### Django, Postgres, and Redis, all in Docker
 
-This is a playground for me to test out getting **Django, PostgreSQL, and Redis** working together within multiple **Docker** containers. I'm also experimenting with **Vagrant** as a standardized Ubuntu 16.04 development environment and to reduce complexity/limitations associated with running Docker Engine in Windows.
+This is a boilerplate repo intended for quickly starting a new **Django** project with **PostgreSQL** and **Redis** support, all running within Docker containers. A **Nginx** service is also defined to enable immediate access to the site over port 80.
 
 ## Prerequisites
 
-* [VirtualBox & VirtualBox Guest Extensions](https://www.virtualbox.org/wiki/Downloads)
-* [Vagrant](https://www.vagrantup.com/docs/installation/)
-* Vagrant Plugins:
-    * (All) [vagrant-vbguest](https://github.com/dotless-de/vagrant-vbguest) to keep Guest Extensions up-to-date in the Guest VM
-    * (Windows) [vagrant-multi-putty](https://github.com/nickryand/vagrant-multi-putty) for PuTTY SSH support
-* (Windows) [PuTTY](http://www.chiark.greenend.org.uk/~sgtatham/putty/download.html) for ssh support
+- Docker
+- Pipenv
+  - Make sure Python3 is available
+  - Enables `pipenv install` to set up libraries locally for the editor to crawl. The Django container also uses Pipenv to install dependencies to encourage use of this new Python package management tool.
+
+## Getting started
+
+1. Clone this repo
+2. Delete the **.git** folder
+    - `rm -rf .git/`
+3. Create a new git repo
+    - `git init`
+    - `git add .`
+    - `git commit -m "Initial Commit"`
+4. Install Python dependencies in a Python3 virtual environment
+    - `pipenv install --three`
+5. Create a new Django project
+    - `pipenv run django-admin startproject appname _app/`
+6. Make the following changes to your Django project's **settings.py**:
+
+```py
+# appname/settings.py
+import os
+
+# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
+
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = os.getenv('DEBUG', False) == 'true'
+
+ALLOWED_HOSTS = [
+    'localhost',
+]
+
+INSTALLED_APPS = [
+    # ...snip...
+    'django_redis',
+]
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': os.getenv('POSTGRES_USER'),
+        'USER': os.getenv('POSTGRES_USER'),
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
+        'HOST': 'db',
+        'PORT': 5432,
+    }
+}
+
+STATIC_ROOT = 'static'
+
+# django-redis
+CACHES = {
+    'default': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': 'redis://redis:6379/1',
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+        }
+    }
+}
+SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+SESSION_CACHE_ALIAS = 'default'
+```
+
+7. Update the **.env** file to specify values for the environment variables defined within
+8. Start Django for development
+    - `docker-compose up`
 
 ## Components
 
-### Vagrantfile
-
-Vagrant is a basic Ubuntu 16.04/`xenial64` image with a few customizations:
-
-* Install Docker prereqs
-* Install linux-image-extra for aufs support
-* Install Docker
-* Install Docker-Compose
-* Miscellaneous Docker-related setup steps
-* Create the alias `dc` for `docker-compose`
-
 ### Dockerfile
 
-This file is derived from the standard `python:3.5-onbuild` Dockerfile, only made a bit more explicit. This Dockerfile is responsible for hosting the Django project.
+Builds the Django container. The container is derived from the standard **python:3.6** image and will run Django's `colletstatic` when being built.
 
 ### docker-compose.yml
 
-Compose is tasked with spinning up three containers: one for PostgreSQL, the above container for Django, and one for Redis. Right now Compose transparently forwards port 8000 for testing. The `web` container's `command` can be easily updated to run the Django server as a WSGI application.
+Tasked with spinning up three containers: the above container for **Django**, one for **PostgreSQL**, and one for **Redis**.
 
-### requirements.txt
+By default an **Nginx** container is also created to reverse-proxy requests to Django and serve static files. In this configuration, the Django server will be available on port 80 during production.
 
-Includes the PyPI packages needed to make Django, Postgre, and Redis work together.
+If the Nginx container is removed, Docker can be accessed directly on port 8000. Static files can then be served from the **static_files_volume** Docker volume.
 
-## Directions
+### docker-compose.override.yml
 
-### Booting up Vagrant
+Loads automatically when running a standard `docker-compose up`. These values are intended for development purposes as they tweak the container configurations in the following way:
 
-Vagrant is intended for local development. To begin, start the VM:
+- Make the Postgres container accessible externally on port 5432
+- Make the site available through Nginx at http://localhost:8000
+- Start gunicorn to reload when it detects a file change
+- Set an environmental flag telling Django that it is running in debug mode
 
-    vagrant up
+### Pipfile/Pipfile.lock
 
-Once the VM is up, **Linux** and **macOS** users can use the following commands to remote into the machine:
+Includes Python packages needed to make Django, Postgre, and Redis work together.
 
-    vagrant ssh
+### .env
 
-**Windows** users can use a similar command after installing **PuTTY** and the **vagrant-multi-putty** plugin:
+Contains environment variables for the containers. Several variables are included for configuring Postgres and Django secrets.
 
-    vagrant putty
+### .editorconfig
 
-> NOTE: If you remote in using a typical ssh client, the default login **username** and **password** should be **vagrant** and **vagrant** respectively.
+Defines some common settings to help ensure consistency of styling across files.
 
-The folder containing this cloned repo will be mapped to `/home/ubuntu/data/`. You'll start in `/home/ubuntu/`, so just `cd data` to jump into the folder containing the Docker, Vagrant, and Django files. From here, you can use `docker-compose` to run commands within either container.
+### .flake8
 
-> NOTE: Django is contained within the `web` container, while PostgreSQL is in the `db` container and Redis is in the `redis` container.
+Configures the **flake8** Python linter. Includes a few common settings to my personal preferences.
 
-### Working with containerized Django
+### .vscode/settings.json
 
-Django commands can be run using the `docker-compose run` command. Just specify the container name and the command that you want to run in the container.
+Helps configure the Python plugin to lint with flake8. A placeholder Python interpreter setting is left in to simplify pointing to the local virtual environment created with Pipenv.
 
-For example, to create a new Django project, run the following command:
+### _app/gunicorn.cfg
 
-    docker-compose run web django-admin.py startproject composeexample .
+Defines settings for gunicorn, including a port binding, workers, and an gunicorn-specific error log.
 
-When the command finishes, you'll find the new project files on your local machine. Thanks to the mapped drive they'll also appear in Vagrant.
+### _app/nginx.conf
 
-> NOTE: The bash alias `dc` has been added to Vagrant to cut down on the number of times you have to type `docker-compose`.
-
-Before you proceed any further, go ahead and update the new project to use the Postgres database in the `db` container:
-
-    # composeexample/settings.py
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            'NAME': 'postgres',
-            'USER': 'postgres',
-            'HOST': 'db',
-            'PORT': 5432,
-        }
-    }
-
-From here, you'll want to run `python manage.py` commands through `docker-compose run`:
-
-    # Create a Django app called 'test'
-    docker-compose run web python manage.py startapp test
-    # Perform DB migrations
-    docker-compose run web python manage.py migrate
-
-While you *can* run `docker-compose run web python manage.py runserver` to start the Django server for local development, you'll want to use Compose to start the actual server in a production environment:
-
-    docker-compose up
-
-This will start both the `db` and `web` containers and make the Django site available locally at http://localhost:8000.
-
-### Specifying environment variables
-
-Environment variables can be declared within `.env` files and assigned to services using the `env_file` key for a particular service:
-
-    services:
-      db:
-        image: postgres
-        env_file: secure.env
-
-For this project, a `secure.env` file has been included to demonstrate how to set a different superuser password for the `db` container (see [here](https://hub.docker.com/_/postgres/) for more postgres-specific variables).
-
-Follow this format when adding new variables:
-
-    VARIABLE_NAME="value-here"
-
-These variables will also be available for use in the `web` container. To use them in your Django project, simply use `os.getenv()`:
-
-    import os
-
-    # composeexample/settings.py
-    DATABASES = {
-        'default': {
-            ...
-            'NAME': os.getenv('POSTGRES_USER'),
-            'USER': os.getenv('POSTGRES_USER'),
-            'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
-            ...
-        }
-    }
-
-The next time you run `docker-compose up` the `web` and `db` containers will both make use of the new password.
-
-### Redis Support
-
-An instance of Redis exists in the `redis` container. To integrate this into your Django project, add `django_redis` to your project's `INSTALLED_APPS` and include the following in `settings.py`:
-
-    # django-redis
-    CACHES = {
-        "default": {
-            "BACKEND": "django_redis.cache.RedisCache",
-            "LOCATION": "redis://redis:6379/1",
-            "OPTIONS": {
-                "CLIENT_CLASS": "django_redis.client.DefaultClient",
-            }
-        }
-    }
-    SESSION_ENGINE = "django.contrib.sessions.backends.cache"
-    SESSION_CACHE_ALIAS = "default"
-
+Establishes a reverse-proxy to Django, and serves Django static files.

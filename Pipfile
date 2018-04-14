@@ -1,0 +1,24 @@
+[[source]]
+
+url = "https://pypi.python.org/simple"
+verify_ssl = true
+name = "pypi"
+
+
+[packages]
+
+Django = "*"
+django-redis = "*"
+gunicorn = "*"
+"psycopg2-binary" = "*"
+
+
+[dev-packages]
+
+"flake8" = "*"
+"flake8-quotes" = "*"
+
+
+[requires]
+
+python_version = "3.6"
