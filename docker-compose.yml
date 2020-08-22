@@ -2,7 +2,7 @@ version: '3'
 
 services:
   db:
-    image: postgres:11.5
+    image: postgres:12.4
     volumes:
       - database_volume:/var/lib/postgresql/data
     networks:
@@ -12,12 +12,12 @@ services:
       - POSTGRES_PASSWORD
 
   redis:
-    image: redis:5.0.5
+    image: redis:6.0.6
     networks:
       - redis_network
 
   nginx:
-    image: nginx:1.17.3-alpine
+    image: nginx:1.19.2-alpine
     ports:
       # Will be available @ localhost:80
       - "80:80"
