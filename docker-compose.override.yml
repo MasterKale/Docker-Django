@@ -1,4 +1,4 @@
-version: '3'
+version: '3.5'
 
 # THESE OVERRIDES ARE FOR DEVELOPMENT! DON'T USE THIS IN PRODUCTION!
 services:
@@ -14,6 +14,6 @@ services:
 
   django:
     # Automatically reload Gunicorn when a file changes
-    command: gunicorn appname.wsgi -c gunicorn.cfg --reload
+    command: gunicorn appname.wsgi -c gunicorn.cfg.py --reload
     environment:
       - DEBUG=true
