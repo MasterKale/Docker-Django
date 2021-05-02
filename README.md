@@ -118,10 +118,22 @@ Configures the **flake8** Python linter. Includes a few common settings to my pe
 
 Helps configure the Python plugin to lint with flake8. A placeholder Python interpreter setting is left in to simplify pointing to the local virtual environment created with Pipenv.
 
-### _app/gunicorn.cfg
+### _app/gunicorn.cfg.py
 
-Defines settings for gunicorn, including a port binding, workers, and an gunicorn-specific error log.
+Defines settings for gunicorn, including a port binding, workers, and a gunicorn-specific error log.
 
-### _app/nginx.conf
+### _ngingx/nginx.conf
 
 Establishes a reverse-proxy to Django, and serves Django static files.
+
+### start-dev.sh
+
+An executable script for starting the server in development mode.
+
+### start-prod.sh
+
+An executable script for starting the server in production mode.
+
+### update-prod-django.sh
+
+An executable script for rebuilding and restarting production Django whenever there's a change. This script also restarts Nginx to ensure no traffic hits the server while the update occurs.
