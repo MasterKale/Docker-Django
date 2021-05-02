@@ -79,7 +79,7 @@ SESSION_CACHE_ALIAS = 'default'
 
 ### Dockerfile
 
-Builds the Django container. The container is derived from the standard **python:3.7** image and will run Django's `colletstatic` when being built.
+Builds the Django container. The container is built from a standard **python** Docker image and will run Django's `colletstatic` when being built.
 
 ### docker-compose.yml
 
