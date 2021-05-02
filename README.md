@@ -106,6 +106,10 @@ Includes Python packages needed to make Django, Postgre, and Redis work together
 
 Contains environment variables for the containers. Several variables are included for configuring Postgres and Django secrets.
 
+### .dockerignore
+
+Defines files that Docker should _never_ include when building the Django image.
+
 ### .editorconfig
 
 Defines some common settings to help ensure consistency of styling across files.
