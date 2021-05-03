@@ -9,6 +9,7 @@
     "--line-length", "99"
   ],
   "[python]": {
+    "editor.defaultFormatter": "ms-python.python",
     "editor.formatOnPaste": false,
     "editor.formatOnSaveMode": "file",
     "editor.formatOnSave": true
