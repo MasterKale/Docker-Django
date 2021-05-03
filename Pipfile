@@ -10,8 +10,13 @@ gunicorn = "*"
 psycopg2-binary = "*"
 
 [dev-packages]
+black = "*"
+mypy = "*"
 flake8 = "*"
 flake8-quotes = "*"
 
 [requires]
 python_version = "3.9"
+
+[pipenv]
+allow_prereleases = true
