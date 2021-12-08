@@ -1,4 +1,4 @@
-FROM python:3.9
+FROM python:3.10
 # collectstatic needs the secret key to be set. We store that in this environment variable.
 # Set this value in this project's .env file
 ARG DJANGO_SECRET_KEY
