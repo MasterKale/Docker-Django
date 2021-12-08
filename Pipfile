@@ -5,7 +5,6 @@ name = "pypi"
 
 [packages]
 Django = "*"
-django-redis = "*"
 gunicorn = "*"
 psycopg2-binary = "*"
 

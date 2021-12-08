@@ -32,14 +32,6 @@
             "index": "pypi",
             "version": "==3.2"
         },
-        "django-redis": {
-            "hashes": [
-                "sha256:1133b26b75baa3664164c3f44b9d5d133d1b8de45d94d79f38d1adc5b1d502e5",
-                "sha256:306589c7021e6468b2656edc89f62b8ba67e8d5a1c8877e2688042263daa7a63"
-            ],
-            "index": "pypi",
-            "version": "==4.12.1"
-        },
         "gunicorn": {
             "hashes": [
                 "sha256:9dcc4547dbb1cb284accfb15ab5667a0e5d1881cc443e0677b4882a4067a807e",
