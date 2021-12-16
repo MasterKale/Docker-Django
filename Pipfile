@@ -6,6 +6,7 @@ name = "pypi"
 [packages]
 Django = "*"
 gunicorn = "*"
+psycopg2 = "*"
 
 [dev-packages]
 black = "*"
