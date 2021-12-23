@@ -39,11 +39,6 @@ ALLOWED_HOSTS = [
     'localhost',
 ]
 
-INSTALLED_APPS = [
-    # ...snip...
-    'django_redis',
-]
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
@@ -57,14 +52,11 @@ DATABASES = {
 
 STATIC_ROOT = 'static'
 
-# django-redis
+# Django's Redis cache support
 CACHES = {
     'default': {
-        'BACKEND': 'django_redis.cache.RedisCache',
+        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
         'LOCATION': 'redis://redis:6379/1',
-        'OPTIONS': {
-            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
-        }
     }
 }
 SESSION_ENGINE = 'django.contrib.sessions.backends.cache'

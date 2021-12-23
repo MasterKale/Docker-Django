@@ -5,9 +5,10 @@ name = "pypi"
 
 [packages]
 Django = "*"
-django-redis = "*"
 gunicorn = "*"
-psycopg2-binary = "*"
+psycopg2 = "*"
+redis = "*"
+hiredis = "*"
 
 [dev-packages]
 black = "*"
@@ -16,7 +17,7 @@ flake8 = "*"
 flake8-quotes = "*"
 
 [requires]
-python_version = "3.9"
+python_version = "3.10"
 
 [pipenv]
 allow_prereleases = true
