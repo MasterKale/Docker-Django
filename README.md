@@ -52,7 +52,9 @@ DATABASES = {
 
 STATIC_ROOT = 'static'
 
-# Django's Redis cache support
+# Redis cache support
+# https://docs.djangoproject.com/en/4.0/topics/cache/#redis-1
+
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.redis.RedisCache',
@@ -64,7 +66,8 @@ SESSION_CACHE_ALIAS = 'default'
 ```
 
 7. Update the **.env** file to specify values for the environment variables defined within
-8. Start Django for development
+8. Do a global search of all files here for "appname" and replace it with the actual name of your app
+9. Start Django for development
     - `docker-compose up`
 
 ## Components
@@ -133,3 +136,13 @@ An executable script for starting the server in production mode.
 ### update-prod-django.sh
 
 An executable script for rebuilding and restarting production Django whenever there's a change. This script also restarts Nginx to ensure no traffic hits the server while the update occurs.
+
+## Troubleshooting
+
+### The Django container reports "exited with code 3"
+
+You probably forgot to replace the string "appname" with the actual name you passed to `django-admin startproject`. Check **_app/gunicorn_appname.log** to see if Gunicorn is erroring out with something like this:
+
+```
+ModuleNotFoundError: No module named 'appname'
+```
