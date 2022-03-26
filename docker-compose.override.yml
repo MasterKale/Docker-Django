@@ -17,6 +17,3 @@ services:
     command: gunicorn appname.wsgi -c gunicorn.cfg.py --reload
     environment:
       - DEBUG=true
-
-  cloudflaretunnel:
-    entrypoint: ["cloudflared", "--version"]
