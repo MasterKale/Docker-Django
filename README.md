@@ -1,7 +1,7 @@
 # Docker'd Django
 ### Django, Postgres, and Redis, all in Docker
 
-This is a boilerplate repo intended for quickly starting a new **Django** project with **PostgreSQL** and **Redis** support, all running within Docker containers. A **Nginx** service is also defined to enable immediate access to the site over port 80.
+This is a boilerplate repo intended for quickly starting a new **Django** project with **PostgreSQL** and **Redis** support, all running within Docker containers. A **Nginx** service is also defined to enable immediate access to the site over port 80, with production hosting over HTTPS made possible via **Cloudflare Tunnel**.
 
 - [Prerequisites](#prerequisites)
 - [Getting started](#getting-started)
