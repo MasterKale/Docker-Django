@@ -59,6 +59,7 @@ services:
       - DJANGO_SECRET_KEY
       - POSTGRES_USER
       - POSTGRES_PASSWORD
+      - PROD_HOST_NAME
 
   cloudflaretunnel:
     image: cloudflare/cloudflared:2022.3.4
