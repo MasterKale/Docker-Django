@@ -29,8 +29,12 @@ services:
       - static_files_volume:/usr/share/nginx/html/static
       # Nginx config
       - ./_nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./_nginx/templates:/etc/nginx/templates
     networks:
       - nginx_network
+    environment:
+      - NGINX_ENVSUBST_TEMPLATE_SUFFIX=.conf
+      - PROD_HOST_NAME
 
   django:
     build:
@@ -55,6 +59,13 @@ services:
       - DJANGO_SECRET_KEY
       - POSTGRES_USER
       - POSTGRES_PASSWORD
+      - PROD_HOST_NAME
+
+  cloudflaretunnel:
+    image: cloudflare/cloudflared:2022.3.4
+    entrypoint: ["cloudflared", "tunnel", "--no-autoupdate", "run", "--token", "$CLOUDFLARE_TUNNEL_TOKEN"]
+    networks:
+      - nginx_network
 
 volumes:
   static_files_volume:

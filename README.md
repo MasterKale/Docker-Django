@@ -1,7 +1,13 @@
 # Docker'd Django
 ### Django, Postgres, and Redis, all in Docker
 
-This is a boilerplate repo intended for quickly starting a new **Django** project with **PostgreSQL** and **Redis** support, all running within Docker containers. A **Nginx** service is also defined to enable immediate access to the site over port 80.
+This is a boilerplate repo intended for quickly starting a new **Django** project with **PostgreSQL** and **Redis** support, all running within Docker containers. A **Nginx** service is also defined to enable immediate access to the site over port 80, with production hosting over HTTPS made possible via **Cloudflare Tunnel**.
+
+- [Prerequisites](#prerequisites)
+- [Getting started](#getting-started)
+- [Components](#components)
+- [Production Hosting](#production-hosting)
+- [Troubleshooting](#troubleshooting)
 
 ## Prerequisites
 
@@ -122,8 +128,9 @@ Helps configure the Python plugin to lint with flake8. A placeholder Python inte
 Defines settings for gunicorn, including a port binding, workers, and a gunicorn-specific error log.
 
 ### _ngingx/nginx.conf
+### _nginx/templates/default.conf.conf
 
-Establishes a reverse-proxy to Django, and serves Django static files.
+Establishes a reverse-proxy to Django, and serves Django static files. The default template leverages the nginx Docker image's ability to reference environment variables via envsubst; this is how the `PROD_HOST_NAME` environment variable is referenced for production access.
 
 ### start-dev.sh
 
@@ -136,6 +143,36 @@ An executable script for starting the server in production mode.
 ### update-prod-django.sh
 
 An executable script for rebuilding and restarting production Django whenever there's a change. This script also restarts Nginx to ensure no traffic hits the server while the update occurs.
+
+## Production Hosting
+
+### Cloudflare Tunnel
+
+The `cloudflaretunnel` service in **docker-compose.yml** can be used to set up HTTPS access to Django via [Cloudflare Tunnel](https://developers.cloudflare.com/cloudflare-one/connections/connect-apps/). To get started, follow these steps:
+
+1. Log into the [Cloudflare Zero Trust dashboard](https://dash.teams.cloudflare.com/)
+2. Click **Access > Tunnels**
+3. Click **Create a tunnel**
+4. Specify a **Tunnel name**
+5. Click **Docker** on the **Install connector** step
+6. Save the value of the `--token` flag in the page's `docker` command to this project's **.env** file as the `CLOUDFLARE_TUNNEL_TOKEN` environment variable
+7. Run **start-prod.sh** to start the tunnel and display an entry under **Connectors**
+8. Click **Next**
+9. Set up a **Public hostname**
+10. For the **Service** select "**HTTP**" and then enter "**nginx**"
+11. Click **Save &lt;tunnel name&gt; tunnel** to complete setup
+12. Set the `PROD_HOST_NAME` variable in the **.env** file to the tunnel's configured **Public hostname**
+
+You will also need to make the following change to Django's **_app/appname/settings.py** to add `PROD_HOST_NAME` as an allowed hostname:
+
+```py
+ALLOWED_HOSTS = [
+    os.getenv("PROD_HOST_NAME", ""),
+    "localhost",
+]
+```
+
+When these steps are complete, running **start-prod.sh** should make Django available on the public internet at `https://$PROD_HOST_NAME`. No firewall ports need to be opened on the production host, and in fact you may wish to set up the firewall to block all incoming traffic for good measure.
 
 ## Troubleshooting
 
