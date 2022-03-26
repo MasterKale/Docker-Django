@@ -13,5 +13,6 @@
     "editor.formatOnPaste": false,
     "editor.formatOnSaveMode": "file",
     "editor.formatOnSave": true
-  }
+  },
+  "markdown.extension.toc.levels": "2..2"
 }
