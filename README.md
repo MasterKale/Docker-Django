@@ -52,7 +52,9 @@ DATABASES = {
 
 STATIC_ROOT = 'static'
 
-# Django's Redis cache support
+# Redis cache support
+# https://docs.djangoproject.com/en/4.0/topics/cache/#redis-1
+
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.redis.RedisCache',
