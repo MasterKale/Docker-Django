@@ -74,7 +74,7 @@ SESSION_CACHE_ALIAS = 'default'
 7. Update the **.env** file to specify values for the environment variables defined within
 8. Do a global search of all files here for "appname" and replace it with the actual name of your app
 9. Start Django for development
-    - `docker-compose up`
+    - `docker compose up`
 
 ## Components
 
