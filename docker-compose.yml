@@ -28,8 +28,6 @@ services:
     command: gunicorn appname.wsgi -c gunicorn.cfg.py
     volumes:
       - ./_app:/usr/src/app
-      # Enable this volume if you want to use Caddy/Nginx/etc... for handling HTTP traffic
-      - static_files_volume:/usr/src/app/static
     networks:
       - database_network
       - redis_network
@@ -42,7 +40,6 @@ services:
       - POSTGRES_PASSWORD
 
 volumes:
-  static_files_volume:
   database_volume:
 
 networks:

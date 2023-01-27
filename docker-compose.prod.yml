@@ -5,14 +5,39 @@ services:
   django:
     networks:
       - hosting_network
+    volumes:
+      - ./_app:/usr/src/app
+      - static_files_volume:/usr/src/app/static
     environment:
       - PROD_HOST_NAME
 
-  cloudflaretunnel:
-    image: cloudflare/cloudflared:2022.3.4
-    entrypoint: ["cloudflared", "tunnel", "--no-autoupdate", "run", "--token", "$CLOUDFLARE_TUNNEL_TOKEN"]
-    networks:
-      - hosting_network
+  # caddy:
+  #   image: caddy:2.6.1-alpine
+  #   restart: unless-stopped
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"
+  #     - "443:443/udp"
+  #   volumes:
+  #     - $PWD/_caddy/Caddyfile:/etc/caddy/Caddyfile
+  #     - static_files_volume:/usr/share/caddy/static
+  #     - caddy_data:/data
+  #     - caddy_config:/config
+  #   networks:
+  #     - hosting_network
+  #   environment:
+  #     - PROD_HOST_NAME
+
+  # cloudflaretunnel:
+  #   image: cloudflare/cloudflared:2022.3.4
+  #   entrypoint: ["cloudflared", "tunnel", "--no-autoupdate", "run", "--token", "$CLOUDFLARE_TUNNEL_TOKEN"]
+  #   networks:
+  #     - hosting_network
 
 networks:
   hosting_network:
+
+volumes:
+  static_files_volume:
+  caddy_data:
+  caddy_config:
