@@ -50,6 +50,23 @@ if PROD_HOST_NAME:
     ALLOWED_HOSTS.append(PROD_HOST_NAME)
     CSRF_TRUSTED_ORIGINS.append(f'https://{PROD_HOST_NAME}')
 
+# Set up whitenoise for static file handling
+INSTALLED_APPS = [
+    # ...
+    # See http://whitenoise.evans.io/en/latest/django.html#using-whitenoise-in-development
+    "whitenoise.runserver_nostatic",
+    "django.contrib.staticfiles",
+    # ...
+]
+
+MIDDLEWARE = [
+    # ...
+    "django.middleware.security.SecurityMiddleware",
+    # See http://whitenoise.evans.io/en/latest/django.html#enable-whitenoise
+    "whitenoise.middleware.WhiteNoiseMiddleware",
+    # ...
+]
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
@@ -61,7 +78,10 @@ DATABASES = {
     }
 }
 
+# Set up static files
 STATIC_ROOT = 'static'
+# See http://whitenoise.evans.io/en/latest/django.html#enable-whitenoise
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # Redis cache support
 # https://docs.djangoproject.com/en/4.0/topics/cache/#redis-1
