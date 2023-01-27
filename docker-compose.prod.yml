@@ -13,7 +13,7 @@ services:
       - PROD_HOST_NAME
 
   # caddy:
-  #   image: caddy:2.6.1-alpine
+  #   image: caddy:2.6.2-alpine
   #   restart: unless-stopped
   #   ports:
   #     - "80:80"
@@ -30,7 +30,7 @@ services:
   #     - PROD_HOST_NAME
 
   # cloudflaretunnel:
-  #   image: cloudflare/cloudflared:2022.3.4
+  #   image: cloudflare/cloudflared:2023.1.0
   #   entrypoint: ["cloudflared", "tunnel", "--no-autoupdate", "run", "--token", "$CLOUDFLARE_TUNNEL_TOKEN"]
   #   networks:
   #     - hosting_network
