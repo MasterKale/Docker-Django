@@ -1,0 +1,18 @@
+version: '3.5'
+
+# THESE OVERRIDES ARE FOR PRODUCTION! DON'T USE THIS IN DEVELOPMENT!
+services:
+  django:
+    networks:
+      - hosting_network
+    environment:
+      - PROD_HOST_NAME
+
+  cloudflaretunnel:
+    image: cloudflare/cloudflared:2022.3.4
+    entrypoint: ["cloudflared", "tunnel", "--no-autoupdate", "run", "--token", "$CLOUDFLARE_TUNNEL_TOKEN"]
+    networks:
+      - hosting_network
+
+networks:
+  hosting_network:

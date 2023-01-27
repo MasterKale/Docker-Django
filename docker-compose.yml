@@ -28,23 +28,18 @@ services:
     command: gunicorn appname.wsgi -c gunicorn.cfg.py
     volumes:
       - ./_app:/usr/src/app
-      # Django static files will go here so Nginx can access them
+      # Enable this volume if you want to use Caddy/Nginx/etc... for handling HTTP traffic
       - static_files_volume:/usr/src/app/static
     networks:
       - database_network
       - redis_network
+    ports:
+      - "8000:8000"
     environment:
       - PYTHONUNBUFFERED=0
       - DJANGO_SECRET_KEY
       - POSTGRES_USER
       - POSTGRES_PASSWORD
-      - PROD_HOST_NAME
-
-  cloudflaretunnel:
-    image: cloudflare/cloudflared:2022.3.4
-    entrypoint: ["cloudflared", "tunnel", "--no-autoupdate", "run", "--token", "$CLOUDFLARE_TUNNEL_TOKEN"]
-    networks:
-      - nginx_network
 
 volumes:
   static_files_volume:
