@@ -52,6 +52,23 @@ if PROD_HOST_NAME:
     ALLOWED_HOSTS.append(PROD_HOST_NAME)
     CSRF_TRUSTED_ORIGINS.append(f'https://{PROD_HOST_NAME}')
 
+# Configure whitenoise for static file hosting
+INSTALLED_APPS = [
+    # ...
+    # See http://whitenoise.evans.io/en/latest/django.html#using-whitenoise-in-development
+    "whitenoise.runserver_nostatic",
+    "django.contrib.staticfiles",
+    # ...
+]
+
+MIDDLEWARE = [
+    # ...
+    "django.middleware.security.SecurityMiddleware",
+    # See http://whitenoise.evans.io/en/latest/django.html#enable-whitenoise
+    "whitenoise.middleware.WhiteNoiseMiddleware",
+    # ...
+]
+
 # Point Django to Docker-hosted Postgres
 DATABASES = {
     'default': {
@@ -66,6 +83,8 @@ DATABASES = {
 
 # Set up static files
 STATIC_ROOT = 'static'
+# See http://whitenoise.evans.io/en/latest/django.html#enable-whitenoise
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # Redis cache support
 # https://docs.djangoproject.com/en/4.0/topics/cache/#redis-1
@@ -153,8 +172,7 @@ Follow these steps:
 1. Uncomment the `caddy` service in **docker-compose.prod.yml**
 2. Uncomment all `volumes` in **docker-compose.prod.yml**
 3. Uncomment the `static_files_volume:...` entry in `django` service's `volumes` property in **docker-compose.prod.yml**
-4. Find the two lines in **./update-prod-django.sh** ending in "caddy" and follow the instructions above them to include the `caddy` service in the production update process.
-5. Configure your server's firewall to expose TCP for ports 80 and 443, and UDP for port 443. These will allow Caddy to host the site, and generate and periodically update SSL certificates for the site via Let's Encrypt.
+4. Configure your server's firewall to expose TCP for ports 80 and 443, and UDP for port 443. These will allow Caddy to host the site, and generate and periodically update SSL certificates for the site via Let's Encrypt.
 
 When these steps are complete, running **start-prod.sh** should make Django available on the public internet at `https://$PROD_HOST_NAME`.
 
@@ -174,29 +192,6 @@ Uncomment the `cloudflaretunnel` service in **docker-compose.prod.yml** and then
 10. For the **Service** select "**HTTP**" and then enter "**django:8000**"
 11. Click **Save &lt;tunnel name&gt; tunnel** to complete setup
 12. Set the `PROD_HOST_NAME` variable in the **.env** file to the tunnel's configured **Public hostname**
-
-You will also need to make the following change to Django's **_app/appname/settings.py** to set up whitenoise to handle static files:
-
-```py
-INSTALLED_APPS = [
-    # ...
-    # See http://whitenoise.evans.io/en/latest/django.html#using-whitenoise-in-development
-    "whitenoise.runserver_nostatic",
-    "django.contrib.staticfiles",
-    # ...
-]
-
-MIDDLEWARE = [
-    # ...
-    "django.middleware.security.SecurityMiddleware",
-    # See http://whitenoise.evans.io/en/latest/django.html#enable-whitenoise
-    "whitenoise.middleware.WhiteNoiseMiddleware",
-    # ...
-]
-
-# See http://whitenoise.evans.io/en/latest/django.html#enable-whitenoise
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
-```
 
 When these steps are complete, running **start-prod.sh** should make Django available on the public internet at `https://$PROD_HOST_NAME`. No firewall ports need to be opened on the production host, and in fact you may wish to set up the firewall to block all incoming traffic for good measure.
 
