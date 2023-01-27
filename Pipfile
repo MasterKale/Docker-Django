@@ -19,6 +19,3 @@ flake8-quotes = "*"
 
 [requires]
 python_version = "3.10"
-
-[pipenv]
-allow_prereleases = true
