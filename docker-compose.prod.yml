@@ -7,7 +7,8 @@ services:
       - hosting_network
     volumes:
       - ./_app:/usr/src/app
-      - static_files_volume:/usr/src/app/static
+      # Enable this if you decide to use the `caddy` service
+      # - static_files_volume:/usr/src/app/static
     environment:
       - PROD_HOST_NAME
 
@@ -37,7 +38,8 @@ services:
 networks:
   hosting_network:
 
-volumes:
-  static_files_volume:
-  caddy_data:
-  caddy_config:
+# Enable these if you decide to use the `caddy` service
+# volumes:
+  # static_files_volume:
+  # caddy_data:
+  # caddy_config:
