@@ -185,7 +185,7 @@ The `cloudflaretunnel` service in **docker-compose.yml** can be used to set up H
 7. Run **start-prod.sh** to start the tunnel and display an entry under **Connectors**
 8. Click **Next**
 9. Set up a **Public hostname**
-10. For the **Service** select "**HTTP**" and then enter "**nginx**"
+10. For the **Service** select "**HTTP**" and then enter "**django:8000**"
 11. Click **Save &lt;tunnel name&gt; tunnel** to complete setup
 12. Set the `PROD_HOST_NAME` variable in the **.env** file to the tunnel's configured **Public hostname**
 
