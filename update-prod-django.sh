@@ -1,17 +1,13 @@
 #!/bin/bash
 echo "[START]"
-echo "---stopping django and caddy---"
+echo "---stopping django---"
 docker compose stop django
-# Replace the above with this if you're using Caddy
-# docker compose stop django caddy
 echo "---removing containers---"
 docker compose rm -f
 echo "---removing stale volumes---"
 docker volume prune -f
 echo "---rebuilding django---"
 docker compose build django
-echo "---restarting django and caddy---"
+echo "---restarting django---"
 docker compose -f docker-compose.yml up -d --no-deps django
-# Replace the above with this if you're using Caddy
-# docker compose -f docker-compose.yml up -d --no-deps django caddy
 echo "[END]"
