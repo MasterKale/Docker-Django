@@ -67,6 +67,7 @@ MIDDLEWARE = [
     # ...
 ]
 
+# Point Django to Docker-hosted Postgres
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
