@@ -41,9 +41,14 @@ SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', False) == 'true'
 
-ALLOWED_HOSTS = [
-    'localhost',
-]
+# Enable traffic and form submissions from localhost and PROD_HOST_NAME
+ALLOWED_HOSTS = ['localhost']
+CSRF_TRUSTED_ORIGINS = ['http://localhost']
+
+PROD_HOST_NAME = os.getenv('PROD_HOST_NAME', None)
+if PROD_HOST_NAME:
+    ALLOWED_HOSTS.append(PROD_HOST_NAME)
+    CSRF_TRUSTED_ORIGINS.append(f'https://{PROD_HOST_NAME}')
 
 DATABASES = {
     'default': {
