@@ -9,6 +9,7 @@ gunicorn = "*"
 psycopg2 = "*"
 redis = "*"
 hiredis = "*"
+whitenoise = {extras = ["brotli"], version = "*"}
 
 [dev-packages]
 black = "*"
@@ -18,6 +19,3 @@ flake8-quotes = "*"
 
 [requires]
 python_version = "3.10"
-
-[pipenv]
-allow_prereleases = true

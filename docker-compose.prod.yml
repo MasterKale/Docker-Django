@@ -1,0 +1,45 @@
+version: '3.5'
+
+# THESE OVERRIDES ARE FOR PRODUCTION! DON'T USE THIS IN DEVELOPMENT!
+services:
+  django:
+    networks:
+      - hosting_network
+    volumes:
+      - ./_app:/usr/src/app
+      # Enable this if you decide to use the `caddy` service
+      # - static_files_volume:/usr/src/app/static
+    environment:
+      - PROD_HOST_NAME
+
+  # caddy:
+  #   image: caddy:2.6.2-alpine
+  #   restart: unless-stopped
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"
+  #     - "443:443/udp"
+  #   volumes:
+  #     - $PWD/_caddy/Caddyfile:/etc/caddy/Caddyfile
+  #     - static_files_volume:/usr/share/caddy/static
+  #     - caddy_data:/data
+  #     - caddy_config:/config
+  #   networks:
+  #     - hosting_network
+  #   environment:
+  #     - PROD_HOST_NAME
+
+  # cloudflaretunnel:
+  #   image: cloudflare/cloudflared:2023.1.0
+  #   entrypoint: ["cloudflared", "tunnel", "--no-autoupdate", "run", "--token", "$CLOUDFLARE_TUNNEL_TOKEN"]
+  #   networks:
+  #     - hosting_network
+
+networks:
+  hosting_network:
+
+# Enable these if you decide to use the `caddy` service
+# volumes:
+  # static_files_volume:
+  # caddy_data:
+  # caddy_config:

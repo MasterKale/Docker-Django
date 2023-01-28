@@ -1,7 +1,9 @@
 # Docker'd Django
 ### Django, Postgres, and Redis, all in Docker
 
-This is a boilerplate repo intended for quickly starting a new **Django** project with **PostgreSQL** and **Redis** support, all running within Docker containers. A **Nginx** service is also defined to enable immediate access to the site over port 80, with production hosting over HTTPS made possible via **Cloudflare Tunnel**.
+This is a boilerplate repo intended for quickly starting a new **Django** project with **PostgreSQL** and **Redis** support, all running within Docker containers.
+
+Multiple production hosting options are also included. See the **Production Hosting** section below for more information.
 
 - [Prerequisites](#prerequisites)
 - [Getting started](#getting-started)
@@ -41,10 +43,33 @@ SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', False) == 'true'
 
-ALLOWED_HOSTS = [
-    'localhost',
+# Enable traffic and form submissions from localhost and PROD_HOST_NAME
+ALLOWED_HOSTS = ['localhost']
+CSRF_TRUSTED_ORIGINS = ['http://localhost']
+
+PROD_HOST_NAME = os.getenv('PROD_HOST_NAME', None)
+if PROD_HOST_NAME:
+    ALLOWED_HOSTS.append(PROD_HOST_NAME)
+    CSRF_TRUSTED_ORIGINS.append(f'https://{PROD_HOST_NAME}')
+
+# Configure whitenoise for static file hosting
+INSTALLED_APPS = [
+    # ...
+    # See http://whitenoise.evans.io/en/latest/django.html#using-whitenoise-in-development
+    "whitenoise.runserver_nostatic",
+    "django.contrib.staticfiles",
+    # ...
 ]
 
+MIDDLEWARE = [
+    # ...
+    "django.middleware.security.SecurityMiddleware",
+    # See http://whitenoise.evans.io/en/latest/django.html#enable-whitenoise
+    "whitenoise.middleware.WhiteNoiseMiddleware",
+    # ...
+]
+
+# Point Django to Docker-hosted Postgres
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
@@ -56,7 +81,10 @@ DATABASES = {
     }
 }
 
+# Set up static files
 STATIC_ROOT = 'static'
+# See http://whitenoise.evans.io/en/latest/django.html#enable-whitenoise
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # Redis cache support
 # https://docs.djangoproject.com/en/4.0/topics/cache/#redis-1
@@ -82,22 +110,19 @@ SESSION_CACHE_ALIAS = 'default'
 
 Builds the Django container. The container is built from a standard **python** Docker image and will run Django's `colletstatic` when being built.
 
-### docker-compose.yml
+### docker-compose.yml + docker-compose.dev.yml
 
-Tasked with spinning up three containers: the above container for **Django**, one for **PostgreSQL**, and one for **Redis**.
+Use `./start-dev.sh` to start Django for development. This will spin up three containers: the above container for **Django**, one for **PostgreSQL**, and one for **Redis**.
 
-By default an **Nginx** container is also created to reverse-proxy requests to Django and serve static files. In this configuration, the Django server will be available on port 80 during production.
+Django can be accessed in DEBUG mode directly from http://localhost:8000 during development. The Gunicorn workers are set to reload when file changes are detected.
 
-If the Nginx container is removed, Docker can be accessed directly on port 8000. Static files can then be served from the **static_files_volume** Docker volume.
+Postgres can also be directly accessed at `localhost:5432` using the credentials you specified in the **.env** file.
 
-### docker-compose.override.yml
+### docker-compose.yml + docker-compose.prod.yml
 
-Loads automatically when running a standard `docker-compose up`. These values are intended for development purposes as they tweak the container configurations in the following way:
+See the **Production Hosting** section below for more information.
 
-- Make the Postgres container accessible externally on port 5432
-- Make the site available through Nginx at http://localhost:8000
-- Start gunicorn to reload when it detects a file change
-- Set an environmental flag telling Django that it is running in debug mode
+Use `./start-dev.sh` to start Django for production. You can also run `./update-prod-django.sh` whenever you need to deploy a new build.
 
 ### Pipfile/Pipfile.lock
 
@@ -127,28 +152,33 @@ Helps configure the Python plugin to lint with flake8. A placeholder Python inte
 
 Defines settings for gunicorn, including a port binding, workers, and a gunicorn-specific error log.
 
-### _ngingx/nginx.conf
-### _nginx/templates/default.conf.conf
+### _caddy/Caddyfile
 
-Establishes a reverse-proxy to Django, and serves Django static files. The default template leverages the nginx Docker image's ability to reference environment variables via envsubst; this is how the `PROD_HOST_NAME` environment variable is referenced for production access.
-
-### start-dev.sh
-
-An executable script for starting the server in development mode.
-
-### start-prod.sh
-
-An executable script for starting the server in production mode.
-
-### update-prod-django.sh
-
-An executable script for rebuilding and restarting production Django whenever there's a change. This script also restarts Nginx to ensure no traffic hits the server while the update occurs.
+Establishes a reverse-proxy to Django, and serves Django static files using [Caddy](https://caddyserver.com/v2). See **Production Hosting** below for more info.
 
 ## Production Hosting
 
-### Cloudflare Tunnel
+This project includes two options for handling production hosting, including reverse-proxying Django and handling SSL:
 
-The `cloudflaretunnel` service in **docker-compose.yml** can be used to set up HTTPS access to Django via [Cloudflare Tunnel](https://developers.cloudflare.com/cloudflare-one/connections/connect-apps/). To get started, follow these steps:
+1. Use [Caddy](https://caddyserver.com/v2)
+2. Use [Cloudflare Tunnel](https://developers.cloudflare.com/cloudflare-one/connections/connect-apps/)
+
+**You'll only need one of these!** Which ever option you choose below, delete the other commented-out service in **docker-compose.prod.yml**.
+
+### Option 1: Use Caddy
+
+Follow these steps:
+
+1. Uncomment the `caddy` service in **docker-compose.prod.yml**
+2. Uncomment all `volumes` in **docker-compose.prod.yml**
+3. Uncomment the `static_files_volume:...` entry in `django` service's `volumes` property in **docker-compose.prod.yml**
+4. Configure your server's firewall to expose TCP for ports 80 and 443, and UDP for port 443. These will allow Caddy to host the site, and generate and periodically update SSL certificates for the site via Let's Encrypt.
+
+When these steps are complete, running **start-prod.sh** should make Django available on the public internet at `https://$PROD_HOST_NAME`.
+
+### Option 2: Use Cloudflare Tunnel
+
+Uncomment the `cloudflaretunnel` service in **docker-compose.prod.yml** and then follow these steps:
 
 1. Log into the [Cloudflare Zero Trust dashboard](https://dash.teams.cloudflare.com/)
 2. Click **Access > Tunnels**
@@ -159,18 +189,9 @@ The `cloudflaretunnel` service in **docker-compose.yml** can be used to set up H
 7. Run **start-prod.sh** to start the tunnel and display an entry under **Connectors**
 8. Click **Next**
 9. Set up a **Public hostname**
-10. For the **Service** select "**HTTP**" and then enter "**nginx**"
+10. For the **Service** select "**HTTP**" and then enter "**django:8000**"
 11. Click **Save &lt;tunnel name&gt; tunnel** to complete setup
 12. Set the `PROD_HOST_NAME` variable in the **.env** file to the tunnel's configured **Public hostname**
-
-You will also need to make the following change to Django's **_app/appname/settings.py** to add `PROD_HOST_NAME` as an allowed hostname:
-
-```py
-ALLOWED_HOSTS = [
-    os.getenv("PROD_HOST_NAME", ""),
-    "localhost",
-]
-```
 
 When these steps are complete, running **start-prod.sh** should make Django available on the public internet at `https://$PROD_HOST_NAME`. No firewall ports need to be opened on the production host, and in fact you may wish to set up the firewall to block all incoming traffic for good measure.
 

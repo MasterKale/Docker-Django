@@ -5,3 +5,4 @@ _psql
 # NEVER COMMIT SECRETS TO YOUR REPO!
 # Uncomment this next line after cloning and remove .env from the repo after cloning
 # *.env
+_app/static/
